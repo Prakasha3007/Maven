@@ -76,7 +76,7 @@ jobs:
         run: |
           try {
             Write-Host "Executing Maven Build..."
-            & mvn -f "${{ inputs.mavenPomFile }}" mvn clean package ${{ inputs.options }}
+            mvn clean package
             Write-Host "Maven Build Completed Successfully."
           } catch {
             Write-Error "Maven Build Failed."
