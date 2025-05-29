@@ -72,6 +72,7 @@ jobs:
             Write-Host "Executing Maven Build..."
             #mvn "${{ inputs.mavenPomFile }}"
             cd $(Split-Path -Path "${{ inputs.mavenPomFile }}")
+            mvn clean package
             Write-Host "Maven Build Completed Successfully."
           } catch {
             Write-Error "Maven Build Failed."
