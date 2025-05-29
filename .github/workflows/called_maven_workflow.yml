@@ -31,6 +31,12 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: 8
+          distribution: 'adopt'
  
       - name: Maven Task Header
         run: |
@@ -70,9 +76,7 @@ jobs:
         run: |
           try {
             Write-Host "Executing Maven Build..."
-            #mvn "${{ inputs.mavenPomFile }}"
-            cd $(Split-Path -Path "${{ inputs.mavenPomFile }}")
-            mvn clean package
+            & mvn -f "${{ inputs.mavenPomFile }}" ${{ inputs.options }}
             Write-Host "Maven Build Completed Successfully."
           } catch {
             Write-Error "Maven Build Failed."
