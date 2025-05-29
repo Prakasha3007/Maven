@@ -62,10 +62,6 @@ jobs:
               Write-Error "Error: POM file not found at path: '${{ inputs.mavenPomFile }}'"
               throw
             }
-            if ([string]::IsNullOrWhiteSpace("${{ inputs.testRunTitle }}")) {
-              Write-Error "Error: Test Run Title is empty."
-              exit 1
-            }
           } catch {
             Write-Error $_.Exception.Message
             exit 1
