@@ -70,7 +70,7 @@ jobs:
         run: |
           try {
             Write-Host "Executing Maven Build..."
-            & mvn -f "${{ inputs.mavenPomFile }}" ${{ inputs.options }}
+            & mvn -f "${{ inputs.mavenPomFile }}"
             Write-Host "Maven Build Completed Successfully."
           } catch {
             Write-Error "Maven Build Failed."
