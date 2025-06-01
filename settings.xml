@@ -1,1 +1,17 @@
+<settings>
+  <mirrors>
+    <mirror>
+      <id>nexus</id>
+      <mirrorOf>*</mirrorOf>  <!-- mirror everything -->
+      <url>http://10.0.0.5:8081/repository/maven-central/</url>
+    </mirror>
+  </mirrors>
 
+  <servers>
+    <server>
+      <id>nexus</id>
+      <username>${env.NEXUS_USERNAME}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+    </server>
+  </servers>
+</settings>
