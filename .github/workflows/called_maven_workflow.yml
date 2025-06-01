@@ -75,32 +75,36 @@ jobs:
             exit 1
           }
  
-      - name: Run Maven Package
+      - name: 🚀 Run Maven Package
         shell: pwsh
         run: |
           $pom = "${{ inputs.mavenPomFile }}"
           $opts = "${{ inputs.options }}"
           $title = "${{ inputs.testRunTitle }}"
-  
-          Write-Host "Starting Maven build..."
+      
+          Write-Host "🚀 Starting Maven build..."
           if ($title) {
-            Write-Host "Test Run Title: $title"
+            Write-Host "🏷️ Test Run Title: $title"
           }
-          Write-Host "Using POM: $pom"
+          Write-Host "📄 Using POM: $pom"
           if ($opts) {
-            Write-Host "Maven Options: $opts"
+            Write-Host "⚙️ Maven Options: $opts"
             $cmd = "mvn --batch-mode --file `"$pom`" $opts clean package"
           } else {
             $cmd = "mvn --batch-mode --file `"$pom`" clean package"
           }
-  
-          Write-Host "Running command: $cmd"
-          $result = Invoke-Expression $cmd
-  
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "❌ Maven build failed!"
-            Write-Error $result
-            exit $LASTEXITCODE
+      
+          Write-Host "🔧 Running command: $cmd"
+          try {
+            Invoke-Expression $cmd
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "❌ Maven build failed!"
+              exit $LASTEXITCODE
+            }
+            Write-Host "✅ Maven build completed successfully."
+          } catch {
+            Write-Error "❌ Maven build failed with an exception."
+            Write-Error $_.Exception.Message
+            exit 1
           }
-  
-          Write-Host "Maven build completed successfully."
+      
