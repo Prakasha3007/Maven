@@ -91,9 +91,9 @@ jobs:
             Write-Host "Maven Options: $opts"
             $cmd = "mvn --batch-mode --file `"$pom`" $opts package"
           } else {
-            #$cmd = "mvn --batch-mode --file `"$pom`" package"
+            $cmd = "mvn --batch-mode --file `"$pom`" clean package"
             Write-Host "Inisde the command "
-            $cmd = "mvn package"
+            #$cmd = "mvn package"
           }
   
           Write-Host "Running command: $cmd"
