@@ -13,5 +13,8 @@ jobs:
       mavenPomFile: './pom.xml'
       options: '--settings settings.xml'
       #options: ''
-      testRunTitle: ''
+      testRunTitle: 'IBP Data Query'
+    secrets:
+      nexus_username: ${{ secrets.NEXUS_USERNAME }}
+      nexus_password: ${{ secrets.NEXUS_PASSWORD }}  
 
