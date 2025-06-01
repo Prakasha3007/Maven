@@ -11,6 +11,7 @@ jobs:
     uses: ./.github/workflows/called_maven_workflow.yml
     with:
       mavenPomFile: './pom.xml'
-      options: '--settings settings.xml'
+      #options: '--settings settings.xml'
+      options: ''
       testRunTitle: ''
 
