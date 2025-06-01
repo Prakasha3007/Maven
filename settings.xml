@@ -1,17 +1,18 @@
-<settings>
-  <mirrors>
-    <mirror>
-      <id>nexus</id>
-      <mirrorOf>*</mirrorOf>  <!-- mirror everything -->
-      <url>http://10.0.0.5:8081/repository/maven-central/</url>
-    </mirror>
-  </mirrors>
-
-  <servers>
-    <server>
-      <id>nexus</id>
-      <username>${secrets.nexus_username}</username>
-      <password>${secrets.nexus_password}</password>
-    </server>
-  </servers>
-</settings>
+- name: Configure Maven Settings
+  run: |
+    echo "<settings>
+      <mirrors>
+        <mirror>
+          <id>nexus</id>
+          <mirrorOf>*</mirrorOf>
+          <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        </mirror>
+      </mirrors>
+      <servers>
+        <server>
+          <id>nexus</id>
+          <username>${{ secrets.NEXUS_USERNAME }}</username>
+          <password>${{ secrets.NEXUS_PASSWORD }}</password>
+        </server>
+      </servers>
+    </settings>" > settings.xml
