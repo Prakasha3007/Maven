@@ -45,7 +45,7 @@
     <repositories>
         <repository>
             <id>central</id>
-            <url>https://repo.maven.apache.org/maven2</url>
+            <url>http://10.0.0.5:8081/repository/maven-central/</url>
         </repository>
     </repositories>
 </project>
