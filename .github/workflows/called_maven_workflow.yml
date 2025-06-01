@@ -67,6 +67,27 @@ jobs:
             Write-Error $_.Exception.Message
             exit 1
           }
+
+      - name: Configure Maven Settings
+        shell: pwsh
+        run: |
+          echo "<settings>
+            <mirrors>
+              <mirror>
+                <id>nexus</id>
+                <mirrorOf>*</mirrorOf>
+                <url>http://10.0.0.5:8081/repository/maven-central/</url>
+              </mirror>
+            </mirrors>
+            <servers>
+              <server>
+                <id>nexus</id>
+                <username>${{ secrets.nexus_username }}</username>
+                <password>${{ secrets.nexus_password }}</password>
+              </server>
+            </servers>
+          </settings>" > settings.xml
+    
  
       - name: Run Maven Package
         shell: pwsh
