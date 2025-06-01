@@ -68,25 +68,32 @@ jobs:
             exit 1
           }
 
-      - name: Configure Maven Settings
+      - name: Create Maven Settings
         shell: pwsh
         run: |
-          echo "<settings>
-            <mirrors>
-              <mirror>
-                <id>nexus</id>
-                <mirrorOf>*</mirrorOf>
-                <url>http://10.0.0.5:8081/repository/maven-central/</url>
-              </mirror>
-            </mirrors>
-            <servers>
-              <server>
-                <id>nexus</id>
-                <username>${{ secrets.nexus_username }}</username>
-                <password>${{ secrets.nexus_password }}</password>
-              </server>
-            </servers>
-          </settings>" > settings.xml
+          $settingsXml = @"
+          <settings>
+           <mirrors>
+             <mirror>
+               <id>nexus</id>
+               <mirrorOf>*</mirrorOf>
+               <url>http://10.0.0.5:8081/repository/maven-central/</url>
+             </mirror>
+           </mirrors>
+           <servers>
+             <server>
+               <id>nexus</id>
+               <username>${{ secrets.nexus_username }}</username>
+               <password>${{ secrets.nexus_password }}</password>
+             </server>
+           </servers>
+          </settings>
+          "@
+      
+          Write-Host "Creating settings.xml..."
+          $settingsXml | Out-File -FilePath "./settings.xml" -Encoding utf8
+          Write-Host "settings.xml created successfully."
+
     
  
       - name: Run Maven Package
