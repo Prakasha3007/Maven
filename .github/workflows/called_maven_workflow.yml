@@ -8,6 +8,13 @@ name: Maven Reusable Workflow
  
 on:
   workflow_call:
+    secrets:
+      nexus_username:
+        description: 'Nexus username'
+        required: true
+      nexus_password:
+       description: 'Nexus password'
+       required: true
     inputs:
       mavenPomFile:
         description: 'Path to the Maven POM file'
