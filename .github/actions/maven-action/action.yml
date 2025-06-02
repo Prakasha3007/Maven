@@ -4,32 +4,32 @@
 # Version       : v3
 #########################################################################
 
-name: Maven Reusable Workflow
+name: Maven
 
 inputs:
   mavenPomFile:
-    description: 'Path to the Maven POM file'
+    description: 'The relative path to the Maven POM file that defines the project configuration and dependencies.'
     required: true
     type: string
   goals:
-    description: ''
+    description: 'The Maven goals to execute, such as `clean`, `package`, `install`, etc.'
     required: false
     type: string   
   options:
-    description: 'Additional Maven command-line options'
+    description: 'Additional command-line options to pass to the Maven command, such as `-DskipTests` or `--settings ./settings.xml`.'
     required: false
     type: string
     default: ''
   testRunTitle:
-    description: 'Title for the test run'
+    description: 'A descriptive title for the test run, useful for identifying the purpose of the build.'
     required: false
     type: string
     default: 'Default Test Run'
   nexus_username:
-    description: 'Nexus username'
+    description: 'The username for authenticating with the Nexus repository, used for deploying artifacts.'
     required: true
   nexus_password:
-    description: 'Nexus password'
+    description: 'The password for authenticating with the Nexus repository, used for deploying artifacts.'
     required: true
 
 runs:
