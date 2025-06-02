@@ -42,10 +42,40 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>central</id>
-            <url>http://10.0.0.5:8081/repository/maven-central/</url>
-        </repository>
-    </repositories>
+<repositories>
+    <repository>
+        <id>nexus-maven-group</id>
+        <name>Nexus Maven Group Repository</name>
+        <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </repository>
+</repositories>
+
+<pluginRepositories>
+    <pluginRepository>
+        <id>nexus-maven-group</id>
+        <name>Nexus Maven Group Repository</name>
+        <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        <releases>
+            <enabled>true</enabled>
+        </releases>
+        <snapshots>
+            <enabled>true</enabled>
+        </snapshots>
+    </pluginRepository>
+</pluginRepositories>
+
+<distributionManagement>
+    <repository>
+        <id>nexus-maven-group</id>
+        <name>Nexus Maven Group Repository</name>
+        <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        <uniqueVersion>false</uniqueVersion>
+    </repository>
+</distributionManagement>
 </project>
