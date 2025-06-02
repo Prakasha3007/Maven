@@ -67,6 +67,7 @@ runs:
         }
 
     - name: Verify Maven Installation
+      shell: pwsh
       run: mvn -v 
 
     - name: Run Maven Package
