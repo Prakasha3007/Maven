@@ -1,14 +1,14 @@
 <settings>
   <servers>
     <server>
-      <id>nexus-tfs-repo</id>
+      <id>nexus-maven-group</id>
       <username>${secrets.nexus_username}</username>
       <password>${secrets.nexus_password}</password>
     </server>
   </servers>
  <mirrors>
     <mirror>
-        <id>nexus-tfs-repo</id>
+        <id>nexus-maven-group</id>
         <mirrorOf>external:http:*</mirrorOf>
         <url>http://10.0.0.5:8081/repository/maven-central/</url>
         <blocked>false</blocked>
