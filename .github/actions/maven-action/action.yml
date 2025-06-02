@@ -90,9 +90,6 @@ runs:
     
         Write-Host "Running command: $cmd"
         try {
-          $logFile = "maven-debug.log"
-          $cmd = "$cmd > $logFile 2>&1"
-          Write-Host "Logs will be saved to: $logFile"
           Invoke-Expression $cmd
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Maven build failed!"
@@ -100,7 +97,7 @@ runs:
           }
           Write-Host "Maven build completed successfully."
         } catch {
-          Write-Error "Maven build failed with an exception."
+          Write-Error "Maven build failed with an exception: $_"
           Write-Error $_.Exception.Message
           Write-Error $_.Exception.StackTrace
           exit 1
