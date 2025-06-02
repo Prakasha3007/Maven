@@ -11,8 +11,9 @@ jobs:
     uses: ./.github/workflows/called_maven_workflow.yml
     with:
       mavenPomFile: './pom.xml'
-      options: '--settings ./settings.xml'
-      #options: ''
+      goals: clean package
+      #options: '--settings ./settings.xml'
+      options: ''
       testRunTitle: 'IBP Data Query'
     secrets:
       nexus_username: ${{ secrets.NEXUS_USERNAME }}
