@@ -2,8 +2,8 @@
   <servers>
     <server>
       <id>nexus-maven-group</id>
-      <username>${secrets.nexus_username}</username>
-      <password>${secrets.nexus_password}</password>
+      <username>${inputs.nexus_username}</username>
+      <password>${inputs.nexus_password}</password>
     </server>
   </servers>
  <mirrors>
