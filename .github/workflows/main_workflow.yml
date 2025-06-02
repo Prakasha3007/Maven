@@ -16,7 +16,7 @@ jobs:
 
       # Step 2: Call Maven Workflow
       - name: Call Maven Workflow
-        uses: ./.github/workflows/called_maven_workflow.yml
+        uses: ./.github/actions/maven-action
         with:
           mavenPomFile: './pom.xml'
           goals: clean package
