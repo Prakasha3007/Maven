@@ -82,9 +82,9 @@ runs:
         Write-Host "Using goal: $goal"
         if ($opts) {
           Write-Host "Maven Options: $opts"
-          $cmd = "mvn --batch-mode --file `"$pom`" $opts $goal"
+          $cmd = "mvn --batch-mode --file `"$pom`" $opts $goal -X"
         } else {
-          $cmd = "mvn --batch-mode --file `"$pom`" $goal"
+          $cmd = "mvn --batch-mode --file `"$pom`" $goal -X"
         }
     
         Write-Host "Running command: $cmd"
