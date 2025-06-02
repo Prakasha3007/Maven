@@ -22,6 +22,7 @@ jobs:
           goals: clean package
           options: '--settings ./settings.xml'
           testRunTitle: 'IBP Data Query'
+        env:  
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
