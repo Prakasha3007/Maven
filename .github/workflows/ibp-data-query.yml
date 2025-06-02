@@ -19,8 +19,7 @@ jobs:
           mavenPomFile: './pom.xml'
           goals: clean package
           options: '--settings ./settings.xml'
-          testRunTitle: 'IBP Data Query'
-        env:  
+          testRunTitle: 'IBP Data Query'  
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
