@@ -66,6 +66,9 @@ runs:
           exit 1
         }
 
+    - name: Verify Maven Installation
+      run: mvn -v 
+
     - name: Run Maven Package
       shell: pwsh
       run: |
@@ -89,7 +92,7 @@ runs:
     
         Write-Host "Running command: $cmd"
         try {
-          Invoke-Expression "$cmd"
+          Invoke-Expression $cmd
           if ($LASTEXITCODE -ne 0) {
             Write-Error "Maven build failed!"
             exit $LASTEXITCODE
