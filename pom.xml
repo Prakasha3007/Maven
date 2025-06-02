@@ -46,7 +46,7 @@
     <repository>
         <id>nexus-maven-group</id>
         <name>Nexus Maven Group Repository</name>
-        <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        <url>http://10.0.0.5:8081/repository/maven-public/</url>
         <releases>
             <enabled>true</enabled>
         </releases>
@@ -60,7 +60,7 @@
     <pluginRepository>
         <id>nexus-maven-group</id>
         <name>Nexus Maven Group Repository</name>
-        <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        <url>http://10.0.0.5:8081/repository/maven-public/</url>
         <releases>
             <enabled>true</enabled>
         </releases>
@@ -74,7 +74,7 @@
     <repository>
         <id>nexus-maven-group</id>
         <name>Nexus Maven Group Repository</name>
-        <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        <url>http://10.0.0.5:8081/repository/maven-public/</url>
         <uniqueVersion>false</uniqueVersion>
     </repository>
 </distributionManagement>
