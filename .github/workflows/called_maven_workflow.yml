@@ -20,6 +20,10 @@ on:
         description: 'Path to the Maven POM file'
         required: true
         type: string
+      goals:
+        description: ''
+        required: false
+        type: string   
       options:
         description: 'Additional Maven command-line options'
         required: false
@@ -67,34 +71,6 @@ jobs:
             Write-Error $_.Exception.Message
             exit 1
           }
-
-      - name: Create Maven Settings
-        shell: pwsh
-        run: |
-          $settingsXml = @"
-          <settings>
-           <mirrors>
-             <mirror>
-               <id>nexus</id>
-               <mirrorOf>*</mirrorOf>
-               <url>http://10.0.0.5:8081/repository/maven-central/</url>
-             </mirror>
-           </mirrors>
-           <servers>
-             <server>
-               <id>nexus</id>
-               <username>${{ secrets.nexus_username }}</username>
-               <password>${{ secrets.nexus_password }}</password>
-             </server>
-           </servers>
-          </settings>
-          "@
-      
-          Write-Host "Creating settings.xml..."
-          $settingsXml | Out-File -FilePath "./settings.xml" -Encoding utf8
-          Write-Host "settings.xml created successfully."
-
-    
  
       - name: Run Maven Package
         shell: pwsh
@@ -102,17 +78,19 @@ jobs:
           $pom = "${{ inputs.mavenPomFile }}"
           $opts = "${{ inputs.options }}"
           $title = "${{ inputs.testRunTitle }}"
+          $goal = "${{ inputs.goals }}"
       
           Write-Host "Starting Maven build..."
           if ($title) {
             Write-Host "Test Run Title: $title"
           }
           Write-Host "Using POM: $pom"
+          Write-Host "Using goal: $goal"
           if ($opts) {
             Write-Host "Maven Options: $opts"
-            $cmd = "mvn --batch-mode --file `"$pom`" $opts clean package"
+            $cmd = "mvn --batch-mode --file `"$pom`" $opts $goal"
           } else {
-            $cmd = "mvn --batch-mode --file `"$pom`" clean package"
+            $cmd = "mvn --batch-mode --file `"$pom`" $goal"
           }
       
           Write-Host "Running command: $cmd"
