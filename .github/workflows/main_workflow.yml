@@ -8,7 +8,7 @@ on:
 
 jobs:
   ibp-data-query:
-    runs-on: windows-latest
+    runs-on: self-hosted
     steps:
       # Step 1: Checkout the repository
       - name: Checkout Repository
