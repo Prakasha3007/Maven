@@ -10,11 +10,9 @@ jobs:
   ibp-data-query:
     runs-on: self-hosted
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # Step 2: Call Maven Workflow
       - name: Call Maven Workflow
         uses: ./.github/actions/maven-action
         with:
@@ -26,7 +24,6 @@ jobs:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
-      # Step 3: Copy Generated Files
       - name: Copy Generated Files
         uses: Prakasha3007/Copy-Files/.github/actions/copyfile-actions@main
         with:
