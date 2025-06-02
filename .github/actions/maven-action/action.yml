@@ -37,6 +37,7 @@ runs:
   steps:
 
     - name: Maven Task Header
+      shell: pwsh
       run: |
         Write-Host "======================================================================="
         Write-Host "Task        : Maven"
