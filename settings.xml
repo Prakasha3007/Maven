@@ -10,7 +10,7 @@
     <mirror>
         <id>nexus-maven-group</id>
         <mirrorOf>external:http:*</mirrorOf>
-        <url>http://10.0.0.5:8081/repository/maven-central/</url>
+        <url>http://10.0.0.5:8081/repository/maven-public/</url>
         <blocked>false</blocked>
     </mirror>
  </mirrors>
