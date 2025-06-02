@@ -98,5 +98,6 @@ runs:
         } catch {
           Write-Error "Maven build failed with an exception."
           Write-Error $_.Exception.Message
+          Write-Error $_.Exception.StackTrace
           exit 1
         }
