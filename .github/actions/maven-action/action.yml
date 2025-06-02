@@ -62,7 +62,7 @@ runs:
             Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
           }
         } catch {
-          Write-Error $_.Exception.Message
+           Write-Error "Exception While Validating inputs: $_"
           exit 1
         }
 
@@ -101,7 +101,5 @@ runs:
           Write-Host "Maven build completed successfully."
         } catch {
           Write-Error "Maven build failed with an exception: $_"
-          Write-Error $_.Exception.Message
-          Write-Error $_.Exception.StackTrace
           exit 1
         }
