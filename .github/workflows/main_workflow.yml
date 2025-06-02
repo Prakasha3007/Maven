@@ -27,7 +27,7 @@ jobs:
 
       # Step 3: Copy Generated Files
       - name: Copy Generated Files
-        uses: ./.github/workflows/called_maven_workflow.yml
+        uses: Prakasha3007/Copy-Files/.github/actions/copyfile-actions@main
         with:
           SourceFolder: sourcefolder
           contents: '**'
@@ -39,3 +39,14 @@ jobs:
           retryCount: '3'
           delayBetweenRetries: '5000'
           ignoreMakeDirErrors: false
+          
+      - name: PowerShell Script
+        uses: Prakasha3007/PowerShell/.github/actions/pshell-actions@main
+        with:
+          targetType: filePath
+          filePath: 'scripts/sample-script.ps1'
+          arguments: 'arg1 arg2'
+          script: hostname
+          workingFolder: '.'
+          errorPreference: Stop
+          ignoreLASTEXITCODE: false    
