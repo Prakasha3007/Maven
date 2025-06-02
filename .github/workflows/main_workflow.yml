@@ -1,4 +1,4 @@
-name: Main Workflow.
+name: Main Workflow
 
 on:
   push:
@@ -7,15 +7,35 @@ on:
   workflow_dispatch:
 
 jobs:
-  call-called-maven-workflow:
-    uses: ./.github/workflows/called_maven_workflow.yml
-    with:
-      mavenPomFile: './pom.xml'
-      goals: clean package
-      #options: '--settings ./settings.xml'
-      options: ''
-      testRunTitle: 'IBP Data Query'
-    secrets:
-      nexus_username: ${{ secrets.NEXUS_USERNAME }}
-      nexus_password: ${{ secrets.NEXUS_PASSWORD }}  
+  main-job:
+    runs-on: windows-latest
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
+      # Step 2: Call Maven Workflow
+      - name: Call Maven Workflow
+        uses: ./.github/workflows/called_maven_workflow.yml
+        with:
+          mavenPomFile: './pom.xml'
+          goals: clean package
+          options: ''
+          testRunTitle: 'IBP Data Query'
+          nexus_username: ${{ secrets.NEXUS_USERNAME }}
+          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
+
+      # Step 3: Copy Generated Files
+      - name: Copy Generated Files
+        uses: ./.github/workflows/called_maven_workflow.yml
+        with:
+          SourceFolder: sourcefolder
+          contents: '**'
+          TargetFolder: targetFolder
+          CleanTargetFolder: true
+          overwrite: false
+          FlattenFolders: false
+          preserveTimestamp: false
+          retryCount: '3'
+          delayBetweenRetries: '5000'
+          ignoreMakeDirErrors: false
