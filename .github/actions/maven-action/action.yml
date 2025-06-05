@@ -25,12 +25,6 @@ inputs:
     required: false
     type: string
     default: 'Default Test Run'
-  nexus_username:
-    description: 'The username for authenticating with the Nexus repository, used for deploying artifacts.'
-    required: true
-  nexus_password:
-    description: 'The password for authenticating with the Nexus repository, used for deploying artifacts.'
-    required: true
 
 runs:
   using: 'composite'
