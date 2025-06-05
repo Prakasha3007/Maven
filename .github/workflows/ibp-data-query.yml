@@ -5,6 +5,10 @@ on:
     branches:
       - main
   workflow_dispatch:
+  
+env: 
+  nexus_username: ${{ secrets.NEXUS_USERNAME }}
+  nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
 jobs:
   ibp-data-query:
@@ -19,9 +23,7 @@ jobs:
           mavenPomFile: './pom.xml'
           goals: clean package
           options: '--settings ./settings.xml'
-          testRunTitle: 'IBP Data Query'  
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
+          testRunTitle: 'IBP Data Query' 
 
       - name: Copy Generated Files
         uses: Prakasha3007/Copy-Files/.github/actions/copyfile-actions@main
@@ -46,4 +48,4 @@ jobs:
           script: hostname
           workingFolder: '.'
           errorPreference: Stop
-          ignoreLASTEXITCODE: false    
+          ignoreLASTEXITCODE: false
