@@ -81,9 +81,9 @@ runs:
         Write-Host "Requested JDK version: $version"
     
         # List installed JDK versions
-        $jdkPaths = Get-ChildItem -Path "C:Program FilesJava" -Directory
+        $jdkPaths = Get-ChildItem -Path "C:\Program Files\Java" -Directory
         if (-not $jdkPaths) {
-          Write-Error "No JDK installations found in 'C:Program FilesJava'."
+          Write-Error "No JDK installations found in 'C:\Program Files\Java'."
           exit 1
         }
     
