@@ -11,6 +11,9 @@ jobs:
     runs-on: windows-latest
     steps:
 
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        
       - name: maven build
         uses: ./.github/workflows/called_maven_workflow.yml
         with:
