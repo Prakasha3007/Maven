@@ -61,7 +61,7 @@ runs:
             Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
           }
         } catch {
-           Write-Error "Exception While Validating inputs: $_"
+          Write-Error "Exception While Validating inputs: $_"
           exit 1
         }
 
@@ -69,9 +69,9 @@ runs:
       shell: pwsh
       run: mvn -v
 
-   - name: Check and Switch to Existing JDK Version
-     shell: pwsh
-     run: |
+    - name: Check and Switch to Existing JDK Version
+      shell: pwsh
+      run: |
         $version = "${{ inputs.jdkVersionOption }}".Trim()
         if (-not $version) { 
           Write-Error "Input JDK version is empty. Please provide a valid JDK version."
@@ -81,9 +81,9 @@ runs:
         Write-Host "Requested JDK version: $version"
     
         # List installed JDK versions
-        $jdkPaths = Get-ChildItem -Path "C:\Program Files\Java" -Directory
+        $jdkPaths = Get-ChildItem -Path "C:Program FilesJava" -Directory
         if (-not $jdkPaths) {
-          Write-Error "No JDK installations found in 'C:\Program Files\Java'."
+          Write-Error "No JDK installations found in 'C:Program FilesJava'."
           exit 1
         }
     
@@ -103,13 +103,12 @@ runs:
     
         # Set JAVA_HOME and update PATH
         $env:JAVA_HOME = $selectedJdk.FullName
-        $env:PATH = "$($env:JAVA_HOME)\bin;$($env:PATH)"
+        $env:PATH = "$($env:JAVA_HOME)bin;$($env:PATH)"
         Write-Host "JAVA_HOME set to: $env:JAVA_HOME"
     
         # Verify the JDK version
         $jdkVersionOutput = & java -version 2>&1
         Write-Host "JDK version in use: $jdkVersionOutput"
-   
 
     - name: Run Maven Package
       shell: pwsh
