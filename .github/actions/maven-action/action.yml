@@ -25,6 +25,11 @@ inputs:
     required: false
     type: string
     default: 'Default Test Run'
+  jdkVersionOption:
+    description: 'A descriptive title for the test run, useful for identifying the purpose of the build.'
+    required: false
+    type: string
+    default: 'default'  
 
 runs:
   using: 'composite'
@@ -62,7 +67,49 @@ runs:
 
     - name: Verify Maven Installation
       shell: pwsh
-      run: mvn -v 
+      run: mvn -v
+
+   - name: Check and Switch to Existing JDK Version
+     shell: pwsh
+     run: |
+        $version = "${{ inputs.jdkVersionOption }}".Trim()
+        if (-not $version) { 
+          Write-Error "Input JDK version is empty. Please provide a valid JDK version."
+          exit 1
+        }
+    
+        Write-Host "Requested JDK version: $version"
+    
+        # List installed JDK versions
+        $jdkPaths = Get-ChildItem -Path "C:\Program Files\Java" -Directory
+        if (-not $jdkPaths) {
+          Write-Error "No JDK installations found in 'C:\Program Files\Java'."
+          exit 1
+        }
+    
+        Write-Host "Installed JDK versions:"
+        $jdkPaths.Name | ForEach-Object { Write-Host " - $_" }
+    
+        # Normalize and match the requested version
+        $matches = $jdkPaths | Where-Object { $_.Name -like "*$version*" }
+        if (-not $matches) {
+          Write-Error "No installed JDK version matches: $version"
+          exit 1
+        }
+    
+        # Select the highest matching version
+        $selectedJdk = $matches | Sort-Object Name -Descending | Select-Object -First 1
+        Write-Host "Using JDK version: $($selectedJdk.Name)"
+    
+        # Set JAVA_HOME and update PATH
+        $env:JAVA_HOME = $selectedJdk.FullName
+        $env:PATH = "$($env:JAVA_HOME)\bin;$($env:PATH)"
+        Write-Host "JAVA_HOME set to: $env:JAVA_HOME"
+    
+        # Verify the JDK version
+        $jdkVersionOutput = & java -version 2>&1
+        Write-Host "JDK version in use: $jdkVersionOutput"
+   
 
     - name: Run Maven Package
       shell: pwsh
