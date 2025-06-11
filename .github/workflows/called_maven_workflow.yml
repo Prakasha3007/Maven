@@ -27,6 +27,11 @@ on:
         required: false
         type: string
         default: 'Default Test Run'
+      jdkVersionOption:
+       description: 'A descriptive title for the test run, useful for identifying the purpose of the build.'
+       required: false
+       type: string
+      
  
 jobs:
   maven-build:
@@ -64,6 +69,30 @@ jobs:
             Write-Error $_.Exception.Message
             exit 1
           }
+
+      - name: Dynamically list all JDKs on all drives
+        shell: pwsh
+        run: |
+          Write-Host "Scanning all drives for JDKs..."
+          $drives = Get-PSDrive -PSProvider 'FileSystem' | Where-Object { $_.Free -gt 0 }
+          
+          foreach ($drive in $drives) {
+            $root = $drive.Root
+            Write-Host "`Searching in $root..."
+            try {
+              Get-ChildItem -Path "$root" -Directory -Recurse -ErrorAction SilentlyContinue |
+              Where-Object { $_.Name -like "jdk*" -or $_.Name -like "java*" } |
+              ForEach-Object {
+                $javaExe = Join-Path $_.FullName "bin\java.exe"
+                if (Test-Path $javaExe) {
+                  Write-Host "`Found: $javaExe"
+                  & $javaExe -version
+                }
+              }
+            } catch {
+              Write-Host "Failed to access $root"
+            }
+          }   
  
       - name: Run Maven Package
         shell: pwsh
