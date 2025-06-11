@@ -69,6 +69,11 @@ runs:
       shell: pwsh
       run: mvn -v
 
+    - name: Print JAVA_HOME
+      shell: pwsh
+      run: |
+        Write-Host "JAVA_HOME: $Env:JAVA_HOME"
+
     - name: Check and Switch to Existing JDK Version
       shell: pwsh
       run: |
