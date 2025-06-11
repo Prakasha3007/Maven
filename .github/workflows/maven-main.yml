@@ -1,4 +1,4 @@
-name: ibp-data-query
+name: maven-main
 
 on:
   push:
