@@ -21,11 +21,13 @@ jobs:
         uses: ./.github/actions/maven-action
         with:
           mavenPomFile: './pom.xml'
-          #goals: clean package
-          goals: clean package deploy 
+          goals: clean package
+          #goals: clean package deploy 
           options: '--settings ./settings.xml'
           testRunTitle: 'IBP Data Query'
-          jdkVersionOption: 1.8
+          javaHomeOption: 'path'
+          jdkVersionOption: ''
+          jdkDirectory: 'C:\Program Files\Java\jdk1.8.0_202'
 
       - name: Copy Generated Files
         uses: Prakasha3007/Copy-Files/.github/actions/copyfile-actions@main
