@@ -1,11 +1,5 @@
-#########################################################################
-# Workflow Name : Maven
-# Description   : Build, test, and deploy with Apache Maven.
-# Version       : v3
-#########################################################################
- 
 name: Maven Reusable Workflow
- 
+
 on:
   workflow_call:
     inputs:
@@ -14,7 +8,7 @@ on:
         required: true
         type: string
       goals:
-        description: ''
+        description: 'Maven goals to execute (e.g., clean package)'
         required: false
         type: string   
       options:
@@ -27,20 +21,27 @@ on:
         required: false
         type: string
         default: 'Default Test Run'
+      javaHomeOption:
+        description: 'Option to set JAVA_HOME (JDKVersion or Path)'
+        required: true
+        type: string
       jdkVersionOption:
-       description: 'A descriptive title for the test run, useful for identifying the purpose of the build.'
-       required: false
-       type: string
-      
- 
+        description: 'JDK version to use (e.g., 1.8, 11)'
+        required: false
+        type: string
+      jdkDirectory:
+        description: 'Custom JDK directory path'
+        required: false
+        type: string
+
 jobs:
   maven-build:
-    runs-on: self-hosted
- 
+    runs-on: windows-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
- 
+
       - name: Maven Task Header
         run: |
           Write-Host "======================================================================="
@@ -48,52 +49,61 @@ jobs:
           Write-Host "Description : Build, test, and deploy with Apache Maven."
           Write-Host "Version     : v3"
           Write-Host "======================================================================="
- 
-      - name: Validate inputs
+
+      - name: Validate and Set JAVA_HOME
         shell: pwsh
         run: |
           try {
-            Write-Host "Validating inputs..."
-            if (-not "${{ inputs.mavenPomFile }}") {
-              Write-Error "'mavenPomFile' is required but not provided."
+            # Retrieve inputs
+            $javaHomeOption = "${{ inputs.javaHomeOption }}"
+            $jdkVersionOption = "${{ inputs.jdkVersionOption }}"
+            $jdkDirectory = "${{ inputs.jdkDirectory }}"
+
+            Write-Host "Validating JAVA_HOME configuration..."
+            Write-Host "javaHomeOption: $javaHomeOption"
+
+            # Common validation for JDK directory
+            if (-not $jdkDirectory) {
+              Write-Error "Error: 'jdkDirectory' is required when 'javaHomeOption' is set to '$javaHomeOption'."
               exit 1
             }
-            Write-Host "mavenPomFile: ${{ inputs.mavenPomFile }}"
-            if ("${{ inputs.options }}") {
-              Write-Host "options: ${{ inputs.options }}"
+
+            $javaExePath = Join-Path $jdkDirectory "binjava.exe"
+            if (-not (Test-Path $javaExePath)) {
+              Write-Error "Error: The specified JDK directory does not contain a valid Java executable: $javaExePath"
+              exit 1
             }
-            if ("${{ inputs.testRunTitle }}") {
-              Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
+
+            # Handle JDKVersion option
+            if ($javaHomeOption -eq "JDKVersion") {
+              if (-not $jdkVersionOption) {
+                Write-Error "Error: 'jdkVersionOption' is required when 'javaHomeOption' is set to 'JDKVersion'."
+                exit 1
+              }
+              Write-Host "JDK Version Option: $jdkVersionOption"
+            } elseif ($javaHomeOption -ne "Path") {
+              Write-Error "Error: Invalid value for 'javaHomeOption'. Expected 'JDKVersion' or 'Path'."
+              exit 1
             }
+
+            # Set JAVA_HOME
+            Write-Host "Setting JAVA_HOME to: $jdkDirectory"
+            [Environment]::SetEnvironmentVariable("JAVA_HOME", $jdkDirectory, "Process")
+            $env:JAVA_HOME = $jdkDirectory
+
+            # Verify JDK version
+            Write-Host "Verifying JDK version..."
+            & $javaExePath -version
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "Error: Failed to verify JDK version at: $javaExePath"
+              exit $LASTEXITCODE
+            }
+            Write-Host "JAVA_HOME set successfully and JDK version verified."
           } catch {
-            Write-Error $_.Exception.Message
+            Write-Error "An error occurred during JAVA_HOME validation: $_.Exception.Message"
             exit 1
           }
 
-      - name: Dynamically list all JDKs on all drives
-        shell: pwsh
-        run: |
-          Write-Host "Scanning all drives for JDKs..."
-          $drives = Get-PSDrive -PSProvider 'FileSystem' | Where-Object { $_.Free -gt 0 }
-          
-          foreach ($drive in $drives) {
-            $root = $drive.Root
-            Write-Host "`Searching in $root..."
-            try {
-              Get-ChildItem -Path "$root" -Directory -Recurse -ErrorAction SilentlyContinue |
-              Where-Object { $_.Name -like "jdk*" -or $_.Name -like "java*" } |
-              ForEach-Object {
-                $javaExe = Join-Path $_.FullName "bin\java.exe"
-                if (Test-Path $javaExe) {
-                  Write-Host "`Found: $javaExe"
-                  & $javaExe -version
-                }
-              }
-            } catch {
-              Write-Host "Failed to access $root"
-            }
-          }   
- 
       - name: Run Maven Package
         shell: pwsh
         run: |
@@ -125,7 +135,6 @@ jobs:
             Write-Host "Maven build completed successfully."
           } catch {
             Write-Error "Maven build failed with an exception."
-            Write-Error $_.Exception.Message
+            Write-Error $_.Exception.Message"
             exit 1
           }
-      
