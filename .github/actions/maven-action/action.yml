@@ -8,7 +8,7 @@ name: Maven
 
 inputs:
   mavenPomFile:
-    description: 'The relative path to the Maven POM file that defines the project configuration and dependencies.'
+    description: 'The relative path to the Maven POM file that defines the project configuration and dependencies..'
     required: true
     type: string
   goals:
