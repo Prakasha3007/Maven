@@ -68,7 +68,7 @@ jobs:
               exit 1
             }
 
-            $javaExePath = Join-Path $jdkDirectory "binjava.exe"
+            $javaExePath = Join-Path $jdkDirectory "bin\java.exe"
             if (-not (Test-Path $javaExePath)) {
               Write-Error "Error: The specified JDK directory does not contain a valid Java executable: $javaExePath"
               exit 1
