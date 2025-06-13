@@ -6,6 +6,20 @@ on:
       - main
   workflow_dispatch:
 
+env:
+  4D_PATH: 'E:\Apps\4D v20.1\4D'  
+  ALTPRO_BUILD: 'E:\Apps\Pipeline\AltPro_Build'
+  ARTIFACT_NAME: 'AltPro.4DZ'
+  ALTPRO_OUT: '${{ env.ALTPRO_BUILD }}\Compiled Database\AltPro\${{ env.ARTIFACT_NAME }}'
+  ALTPRO_SOURCE: 'E:\Apps\Pipeline\AltPro Source'
+  ALTPRO_TARGET: 'E:\Apps\AltPro'
+  BuildConfiguration: 'Release'
+  BuildPlatform: 'any cpu'
+  UMB_UCD_Name: 'AltPro'
+  WINDOWS_HOST: 'vrtdw90527.dev.umb.com'
+  WINDOWS_USER: ${{ secrets.WINDOWS_USER }}
+  WINDOWS_USER_PW: ${{ secrets.WINDOWS_USER_PW }}
+
 jobs:
   maven-build:
         uses: ./.github/workflows/called_maven_workflow.yml
