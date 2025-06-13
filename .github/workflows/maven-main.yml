@@ -14,4 +14,6 @@ jobs:
           goals: clean package
           options: '--settings ./settings.xml'
           testRunTitle: 'IBP Data Query'
-          jdkVersionOption: 1.8
+          javaHomeOption: 'JDKVersion'
+          jdkVersionOption: '1.8'
+          jdkDirectory: 'C:\Program Files\Java\jdk1.8.0_291'
