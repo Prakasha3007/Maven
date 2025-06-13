@@ -90,7 +90,17 @@ jobs:
             Write-Host "Setting JAVA_HOME to: $jdkDirectory"
             [Environment]::SetEnvironmentVariable("JAVA_HOME", $jdkDirectory, "Process")
             $env:JAVA_HOME = $jdkDirectory
-            $env:PATH = "$jdkDirectory\bin;$env:PATH"
+            #$env:PATH = "$jdkDirectory\bin;$env:PATH"
+
+            # Clean PATH of any other Java entries to avoid conflict
+            $cleanedPath = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'Java' -and $_ -ne '' }) -join ';'
+            $env:PATH = "$jdkDirectory\bin;$cleanedPath"
+       
+            # Print JAVA_HOME and check resolved Java path
+            Write-Host "JAVA_HOME is now: $env:JAVA_HOME"
+            Write-Host "Updated PATH: $env:PATH"
+            $javaPath = Get-Command java | Select-Object -ExpandProperty Source
+            Write-Host "Resolved java path: $javaPath"
 
             # Verify JDK version
             Write-Host "Verifying JDK version..."
