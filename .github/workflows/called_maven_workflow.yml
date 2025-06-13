@@ -90,6 +90,7 @@ jobs:
             Write-Host "Setting JAVA_HOME to: $jdkDirectory"
             [Environment]::SetEnvironmentVariable("JAVA_HOME", $jdkDirectory, "Process")
             $env:JAVA_HOME = $jdkDirectory
+            $env:PATH = "$jdkDirectory\bin;$env:PATH"
 
             # Verify JDK version
             Write-Host "Verifying JDK version..."
@@ -107,7 +108,9 @@ jobs:
       - name: Run Maven Package
         shell: pwsh
         run: |
-          java -version
+          # Verify Java version before running Maven
+          Write-Host "Verifying Java version before running Maven..."
+          & java -version
           $pom = "${{ inputs.mavenPomFile }}"
           $opts = "${{ inputs.options }}"
           $title = "${{ inputs.testRunTitle }}"
