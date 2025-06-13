@@ -49,7 +49,6 @@ runs:
         Write-Host "Description : Build, test, and deploy with Apache Maven."
         Write-Host "Version     : v3"
         Write-Host "======================================================================="
-	
     - name: Validate inputs
       shell: pwsh
       run: |
