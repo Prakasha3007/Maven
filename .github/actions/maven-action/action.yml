@@ -42,13 +42,14 @@ runs:
   using: 'composite'
   steps:
     - name: Maven Task Header
+      shell: pwsh
       run: |
         Write-Host "======================================================================="
         Write-Host "Task        : Maven"
         Write-Host "Description : Build, test, and deploy with Apache Maven."
         Write-Host "Version     : v3"
         Write-Host "======================================================================="
-		  
+	
     - name: Validate inputs
       shell: pwsh
       run: |
