@@ -58,23 +58,22 @@ jobs:
             $javaHomeOption = "${{ inputs.javaHomeOption }}"
             $jdkVersionOption = "${{ inputs.jdkVersionOption }}"
             $jdkDirectory = "${{ inputs.jdkDirectory }}"
-
+       
             Write-Host "Validating JAVA_HOME configuration..."
             Write-Host "javaHomeOption: $javaHomeOption"
-
-            # Common validation for JDK directory
+            Write-Host "jdkDirectory: $jdkDirectory"
+       
             if (-not $jdkDirectory) {
               Write-Error "Error: 'jdkDirectory' is required when 'javaHomeOption' is set to '$javaHomeOption'."
               exit 1
             }
-
+       
             $javaExePath = Join-Path $jdkDirectory "bin\java.exe"
             if (-not (Test-Path $javaExePath)) {
               Write-Error "Error: The specified JDK directory does not contain a valid Java executable: $javaExePath"
               exit 1
             }
-
-            # Handle JDKVersion option
+       
             if ($javaHomeOption -eq "JDKVersion") {
               if (-not $jdkVersionOption) {
                 Write-Error "Error: 'jdkVersionOption' is required when 'javaHomeOption' is set to 'JDKVersion'."
@@ -85,60 +84,56 @@ jobs:
               Write-Error "Error: Invalid value for 'javaHomeOption'. Expected 'JDKVersion' or 'Path'."
               exit 1
             }
-
-            # Set JAVA_HOME
-            Write-Host "Setting JAVA_HOME to: $jdkDirectory"
-            [Environment]::SetEnvironmentVariable("JAVA_HOME", $jdkDirectory, "Process")
+       
+            # Set JAVA_HOME for current step
             $env:JAVA_HOME = $jdkDirectory
-            #$env:PATH = "$jdkDirectory\bin;$env:PATH"
-
-            # Clean PATH of any other Java entries to avoid conflict
+       
+            # Remove existing Java entries from PATH
             $cleanedPath = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'Java' -and $_ -ne '' }) -join ';'
             $env:PATH = "$jdkDirectory\bin;$cleanedPath"
        
-            # Print JAVA_HOME and check resolved Java path
-            Write-Host "JAVA_HOME is now: $env:JAVA_HOME"
-            Write-Host "Updated PATH: $env:PATH"
-            $javaPath = Get-Command java | Select-Object -ExpandProperty Source
-            Write-Host "Resolved java path: $javaPath"
-
-            # Verify JDK version
-            Write-Host "Verifying JDK version..."
-            & $javaExePath -version
-            if ($LASTEXITCODE -ne 0) {
-              Write-Error "Error: Failed to verify JDK version at: $javaExePath"
-              exit $LASTEXITCODE
-            }
-            Write-Host "JAVA_HOME set successfully and JDK version verified."
+            # Output for debugging
+            Write-Host "JAVA_HOME: $env:JAVA_HOME"
+            Write-Host "Resolved java path: $(Get-Command java).Source"
+            & java -version
+       
+            # Persist environment variables for next steps
+            "`nJAVA_HOME=$jdkDirectory" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            "`nPATH=$jdkDirectory\bin;$cleanedPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+       
+            Write-Host "JAVA_HOME and PATH exported successfully for subsequent steps."
           } catch {
             Write-Error "An error occurred during JAVA_HOME validation: $_"
             exit 1
           }
-
+ 
       - name: Run Maven Package
         shell: pwsh
         run: |
-          # Verify Java version before running Maven
           Write-Host "Verifying Java version before running Maven..."
+          Write-Host "JAVA_HOME: $env:JAVA_HOME"
+          Write-Host "Resolved java path: $(Get-Command java).Source"
           & java -version
+       
           $pom = "${{ inputs.mavenPomFile }}"
           $opts = "${{ inputs.options }}"
           $title = "${{ inputs.testRunTitle }}"
           $goal = "${{ inputs.goals }}"
-      
+       
           Write-Host "Starting Maven build..."
           if ($title) {
             Write-Host "Test Run Title: $title"
           }
           Write-Host "Using POM: $pom"
           Write-Host "Using goal: $goal"
+          
           if ($opts) {
             Write-Host "Maven Options: $opts"
             $cmd = "mvn --batch-mode --file `"$pom`" $opts $goal"
           } else {
             $cmd = "mvn --batch-mode --file `"$pom`" $goal"
           }
-      
+       
           Write-Host "Running command: $cmd"
           try {
             Invoke-Expression $cmd
@@ -150,4 +145,4 @@ jobs:
           } catch {
             Write-Error "Maven build failed with an exception: $_"
             exit 1
-          }
+          } 
