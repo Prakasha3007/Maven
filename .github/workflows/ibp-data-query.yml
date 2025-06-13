@@ -21,8 +21,8 @@ jobs:
         uses: ./.github/actions/maven-action
         with:
           mavenPomFile: './pom.xml'
-          goals: clean package
-          #goals: clean package deploy 
+          #goals: clean package
+          goals: clean package deploy 
           options: '--settings ./settings.xml'
           testRunTitle: 'IBP Data Query'
           javaHomeOption: 'path'
