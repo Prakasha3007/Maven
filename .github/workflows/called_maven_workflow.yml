@@ -100,7 +100,7 @@ jobs:
             }
             Write-Host "JAVA_HOME set successfully and JDK version verified."
           } catch {
-            Write-Error "An error occurred during JAVA_HOME validation: $_.Exception.Message"
+            Write-Error "An error occurred during JAVA_HOME validation: $_"
             exit 1
           }
 
@@ -134,7 +134,6 @@ jobs:
             }
             Write-Host "Maven build completed successfully."
           } catch {
-            Write-Error "Maven build failed with an exception."
-            Write-Error $_.Exception.Message"
+            Write-Error "Maven build failed with an exception: $_"
             exit 1
           }
