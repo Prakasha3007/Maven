@@ -28,6 +28,8 @@ jobs:
           javaHomeOption: 'path'
           jdkVersionOption: ''
           jdkDirectory: 'C:\Program Files\Java\jdk1.8.0_202'
+          nexus_username: ${{ secrets.NEXUS_USERNAME }}
+          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
       - name: Copy Generated Files
         uses: Prakasha3007/Copy-Files/.github/actions/copyfile-actions@main
