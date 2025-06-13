@@ -107,6 +107,8 @@ jobs:
       - name: Run Maven Package
         shell: pwsh
         run: |
+          Write-Host "Verifying JDK version..."
+          & $javaExePath -version
           $pom = "${{ inputs.mavenPomFile }}"
           $opts = "${{ inputs.options }}"
           $title = "${{ inputs.testRunTitle }}"
