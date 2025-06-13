@@ -16,4 +16,4 @@ jobs:
           testRunTitle: 'IBP Data Query'
           javaHomeOption: 'path'
           jdkVersionOption: ''
-          jdkDirectory: 'C:\Program Files\Java\jdk-24'
+          jdkDirectory: 'C:\Program Files\Java\jdk1.8.0_202'
