@@ -65,6 +65,16 @@ runs:
           exit 1
         }
 
+    - name: Check Specific File
+      shell: pwsh
+      run: |
+        $filePath = '${{ github.workspace }}/target/surefire-reports/Test.xml'
+        if (Test-Path $filePath) {
+            Write-Host "File exists: $filePath"
+        } else {
+            Write-Host "File does not exist: $filePath"
+        }
+
     - name: Publish JUnit Test Results
       shell: pwsh
       run: |
