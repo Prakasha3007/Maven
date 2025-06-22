@@ -25,5 +25,7 @@ jobs:
           goals: clean package
           #goals: clean package deploy 
           options: '--settings ./settings.xml'
-          testRunTitle: 'IBP Data Query'
+          publishJUnitResults: true
+          testResultsFiles: '**/target/surefire-reports/*.xml'
+          testRunTitle: 'testHelloWorld'
 
