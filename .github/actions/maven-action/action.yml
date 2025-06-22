@@ -75,7 +75,7 @@ runs:
         $publishJUnitResults = [bool]::Parse("${{ inputs.publishJUnitResults }}")
         $testResultsFiles = '${{ inputs.testResultsFiles }}'
         $testRunTitle = '${{ inputs.testRunTitle }}'
-        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}") # Correct variable name
+        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}")
         $buildFolder = '${{ github.workspace }}'
       
         Write-Host "Publish JUnit Results: $publishJUnitResults"
@@ -106,7 +106,7 @@ runs:
         $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
             Where-Object { 
                 $_.FullName -like $testResultsFiles -and 
-                ($allowBrokenSymlinks -or -not (Test-Path $_.FullName -PathType Leaf)) # Correct variable name
+                ($allowBrokenSymlinks -or (Test-Path $_.FullName -PathType Leaf)) # Corrected condition
             } |
             Select-Object -ExpandProperty FullName 
       
@@ -128,5 +128,3 @@ runs:
             Write-Host "Publishing test result file: $file"
         }
         Write-Host "Test results published successfully with title: $testRunTitle."
-
-
