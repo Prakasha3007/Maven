@@ -105,15 +105,15 @@ runs:
             Write-Host "Filtering out broken symbolic links..."
             $matchingJUnitResultFiles = $allJUnitResultFiles |
                 Where-Object {
-                    # Debugging: Check file attributes and path validity
+                    # Debugging: Check if the file is a symbolic link and if its target exists
                     $filePath = $_.FullName
-                    $attributes = (Get-Item $filePath).Attributes
                     $isValidPath = Test-Path $filePath -PathType Leaf
-                    $isBrokenSymlink = $attributes -contains 'ReparsePoint'
+                    $isSymbolicLink = ($_.LinkTarget -ne $null)
+                    $isBrokenSymlink = $isSymbolicLink -and (-not (Test-Path $_.LinkTarget))
     
                     Write-Host "File: $filePath"
-                    Write-Host "Attributes: $attributes"
                     Write-Host "Is Valid Path: $isValidPath"
+                    Write-Host "Is Symbolic Link: $isSymbolicLink"
                     Write-Host "Is Broken Symlink: $isBrokenSymlink"
     
                     # Include only valid files (exclude broken symbolic links)
