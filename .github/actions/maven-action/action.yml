@@ -93,21 +93,28 @@ runs:
         Write-Host "Listing all .xml files in the workspace..."
         Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" | ForEach-Object { Write-Host $_.FullName }
       
-        # Find matching JUnit result files
-        $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
-            Where-Object { 
-                $_.FullName -like $testResultsFiles -and (
-                    $allowBrokenSymlinks -or (
-                        (Test-Path $_.FullName -PathType Leaf) -and 
-                        (-not ((Get-Item $_.FullName).Attributes -contains 'ReparsePoint'))
-                    )
-                )
-            } |
-            Select-Object -ExpandProperty FullName 
-      
-        # Debugging: Log matching files
-        Write-Host "Debugging: Matching files after applying pattern and filters..."
-        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
+        # Step 1: Find all files matching the pattern
+        $allJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
+            Where-Object { $_.FullName -like $testResultsFiles }
+    
+        Write-Host "All files matching the pattern:"
+        $allJUnitResultFiles | ForEach-Object { Write-Host $_.FullName }
+    
+        # Step 2: Filter based on $allowBrokenSymlinks
+        if (-not $allowBrokenSymlinks) {
+            Write-Host "Filtering out broken symbolic links..."
+            $matchingJUnitResultFiles = $allJUnitResultFiles |
+                Where-Object {
+                    (Test-Path $_.FullName -PathType Leaf) -and 
+                    (-not ((Get-Item $_.FullName).Attributes -contains 'ReparsePoint'))
+                }
+        } else {
+            Write-Host "Including all files (allowing broken symbolic links)..."
+            $matchingJUnitResultFiles = $allJUnitResultFiles
+        }
+    
+        Write-Host "Debugging: Matching files after applying filters..."
+        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_.FullName }
       
         # Check if any matching files are found
         if (-not $matchingJUnitResultFiles) {
@@ -116,7 +123,7 @@ runs:
         }
         
         Write-Host "Found matching JUnit result files:"
-        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
+        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_.FullName }
       
         # Publish test results (logic for publishing can be customized here)
         foreach ($file in $matchingJUnitResultFiles) {
