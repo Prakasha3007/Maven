@@ -68,7 +68,7 @@ runs:
     - name: Check Specific File
       shell: pwsh
       run: |
-        $filePath = '${{ github.workspace }}/target/surefire-reports/Test.xml'
+        $filePath = '${{ github.workspace }}\target\surefire-reports\TEST-App.xml'
         if (Test-Path $filePath) {
             Write-Host "File exists: $filePath"
         } else {
