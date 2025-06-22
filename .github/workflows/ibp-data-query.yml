@@ -28,5 +28,5 @@ jobs:
           publishJUnitResults: true
           testResultsFiles: '**\target\surefire-reports\*.xml'
           testRunTitle: 'testHelloWorld'
-          allowBrokenSymlinks: true
+          allowBrokenSymlinks: false
 
