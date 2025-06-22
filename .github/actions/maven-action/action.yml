@@ -100,13 +100,24 @@ runs:
         Write-Host "All files matching the pattern:"
         $allJUnitResultFiles | ForEach-Object { Write-Host $_.FullName }
     
-        # Step 2: Filter based on $allowBrokenSymlinks
+        # Step 2: Apply allowBrokenSymlinks logic
         if (-not $allowBrokenSymlinks) {
             Write-Host "Filtering out broken symbolic links..."
             $matchingJUnitResultFiles = $allJUnitResultFiles |
                 Where-Object {
-                    (Test-Path $_.FullName -PathType Leaf) -and 
-                    (-not ((Get-Item $_.FullName).Attributes -contains 'ReparsePoint'))
+                    # Debugging: Check file attributes and path validity
+                    $filePath = $_.FullName
+                    $attributes = (Get-Item $filePath).Attributes
+                    $isValidPath = Test-Path $filePath -PathType Leaf
+                    $isBrokenSymlink = $attributes -contains 'ReparsePoint'
+    
+                    Write-Host "File: $filePath"
+                    Write-Host "Attributes: $attributes"
+                    Write-Host "Is Valid Path: $isValidPath"
+                    Write-Host "Is Broken Symlink: $isBrokenSymlink"
+    
+                    # Include only valid files (exclude broken symbolic links)
+                    $isValidPath -and (-not $isBrokenSymlink)
                 }
         } else {
             Write-Host "Including all files (allowing broken symbolic links)..."
