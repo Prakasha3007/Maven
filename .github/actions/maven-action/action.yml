@@ -101,7 +101,7 @@ runs:
                   $_.FullName -like $testResultsFiles -and 
                   ($allowBrokenSymbolicLinks -or -not (Test-Path $_.FullName -PathType Leaf))
               } |
-              Select-Object -ExpandProperty FullName'    
+              Select-Object -ExpandProperty FullName   
     
         # Check if any matching files are found
         if (-not $matchingJUnitResultFiles) {
