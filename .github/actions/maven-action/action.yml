@@ -106,7 +106,7 @@ runs:
         $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
             Where-Object { 
                 $_.FullName -like $testResultsFiles -and 
-                ($allowBrokenSymlinks -or (Test-Path $_.FullName -PathType Leaf -and !(Get-Item $_.FullName).Attributes -contains 'ReparsePoint')) # Corrected condition
+                ($allowBrokenSymlinks -or (Test-Path $_.FullName -PathType Leaf -and -not ((Get-Item $_.FullName).Attributes -contains 'ReparsePoint'))) # Corrected condition
             } |
             Select-Object -ExpandProperty FullName 
       
