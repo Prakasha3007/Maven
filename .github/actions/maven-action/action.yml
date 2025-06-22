@@ -75,34 +75,28 @@ runs:
         $publishJUnitResults = [bool]::Parse("${{ inputs.publishJUnitResults }}")
         $testResultsFiles = '${{ inputs.testResultsFiles }}'
         $testRunTitle = '${{ inputs.testRunTitle }}'
-        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}")
+        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}") # Correct variable name
         $buildFolder = '${{ github.workspace }}'
-    
+      
         Write-Host "Publish JUnit Results: $publishJUnitResults"
         Write-Host "Test Results Files Pattern: $testResultsFiles"
         Write-Host "Test Run Title: $testRunTitle"
         Write-Host "Allow Broken Symlinks: $allowBrokenSymlinks"
         Write-Host "Build Folder: $buildFolder"
-    
+      
         if (-not $publishJUnitResults) {
             Write-Host "Publishing JUnit results is disabled."
             exit 0
         }
-    
+      
         # Find matching JUnit result files
         $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
             Where-Object { 
-                $_.FullName -like $testResultsFiles
+                $_.FullName -like $testResultsFiles -and 
+                ($allowBrokenSymlinks -or -not (Test-Path $_.FullName -PathType Leaf)) # Correct variable name
             } |
-            Select-Object -ExpandProperty FullName
-            
-        $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
-              Where-Object { 
-                  $_.FullName -like $testResultsFiles -and 
-                  ($allowBrokenSymbolicLinks -or -not (Test-Path $_.FullName -PathType Leaf))
-              } |
-              Select-Object -ExpandProperty FullName   
-    
+            Select-Object -ExpandProperty FullName 
+      
         # Check if any matching files are found
         if (-not $matchingJUnitResultFiles) {
             Write-Host "No test results found matching pattern: $testResultsFiles"
@@ -111,7 +105,7 @@ runs:
         
         Write-Host "Found matching JUnit result files:"
         $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
-    
+      
         # Publish test results (logic for publishing can be customized here)
         foreach ($file in $matchingJUnitResultFiles) {
             Write-Host "Publishing test result file: $file"
