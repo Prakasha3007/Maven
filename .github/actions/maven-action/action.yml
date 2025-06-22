@@ -75,7 +75,7 @@ runs:
         $publishJUnitResults = [bool]::Parse("${{ inputs.publishJUnitResults }}")
         $testResultsFiles = '${{ inputs.testResultsFiles }}'
         $testRunTitle = '${{ inputs.testRunTitle }}'
-        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}")
+        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}") # Correct variable name
         $buildFolder = '${{ github.workspace }}'
       
         Write-Host "Publish JUnit Results: $publishJUnitResults"
@@ -89,43 +89,13 @@ runs:
             exit 0
         }
       
-        # Debugging: List all .xml files in the workspace
-        Write-Host "Listing all .xml files in the workspace..."
-        Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" | ForEach-Object { Write-Host $_.FullName }
-      
-        # Step 1: Find all files matching the pattern
-        $allJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
-            Where-Object { $_.FullName -like $testResultsFiles }
-    
-        Write-Host "All files matching the pattern:"
-        $allJUnitResultFiles | ForEach-Object { Write-Host $_.FullName }
-    
-        # Step 2: Apply allowBrokenSymlinks logic
-        if (-not $allowBrokenSymlinks) {
-            Write-Host "Filtering out broken symbolic links..."
-            $matchingJUnitResultFiles = $allJUnitResultFiles |
-                Where-Object {
-                    # Debugging: Check if the file is a symbolic link and if its target exists
-                    $filePath = $_.FullName
-                    $isValidPath = Test-Path $filePath -PathType Leaf
-                    $isSymbolicLink = ($_.LinkTarget -ne $null)
-                    $isBrokenSymlink = $isSymbolicLink -and (-not (Test-Path $_.LinkTarget))
-    
-                    Write-Host "File: $filePath"
-                    Write-Host "Is Valid Path: $isValidPath"
-                    Write-Host "Is Symbolic Link: $isSymbolicLink"
-                    Write-Host "Is Broken Symlink: $isBrokenSymlink"
-    
-                    # Include only valid files (exclude broken symbolic links)
-                    $isValidPath -and (-not $isBrokenSymlink)
-                }
-        } else {
-            Write-Host "Including all files (allowing broken symbolic links)..."
-            $matchingJUnitResultFiles = $allJUnitResultFiles
-        }
-    
-        Write-Host "Debugging: Matching files after applying filters..."
-        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_.FullName }
+        # Find matching JUnit result files
+        $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
+            Where-Object { 
+                $_.FullName -like $testResultsFiles -and 
+                ($allowBrokenSymlinks -or -not (Test-Path $_.FullName -PathType Leaf)) # Correct variable name
+            } |
+            Select-Object -ExpandProperty FullName 
       
         # Check if any matching files are found
         if (-not $matchingJUnitResultFiles) {
@@ -134,10 +104,11 @@ runs:
         }
         
         Write-Host "Found matching JUnit result files:"
-        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_.FullName }
+        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
       
         # Publish test results (logic for publishing can be customized here)
         foreach ($file in $matchingJUnitResultFiles) {
             Write-Host "Publishing test result file: $file"
         }
         Write-Host "Test results published successfully with title: $testRunTitle."
+
