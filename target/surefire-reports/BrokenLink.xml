@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="com.example.App" tests="1" failures="0" errors="0" skipped="0" time="0.045">
+<testsuite name="BrokenLink" tests="0" failures="0" errors="1" skipped="0" time="0.000">
   <properties>
-    <property name="java.version" value="1.8.0_202"/>
-    <property name="os.name" value="Windows 10"/>
-  <testcase classname="com.example.App" name="testHelloWorld" time="0.045"/>
+    <property name="status" value="broken"/>
+    <property name="reason" value="Symbolic link target not found or inaccessible"/>
+  </properties>
+  <error message="The test results file is missing or the symbolic link is broken."/>
 </testsuite>
