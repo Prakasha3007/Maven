@@ -3,6 +3,5 @@
   <properties>
     <property name="java.version" value="1.8.0_202"/>
     <property name="os.name" value="Windows 10"/>
-  </properties>
   <testcase classname="com.example.App" name="testHelloWorld" time="0.045"/>
 </testsuite>
