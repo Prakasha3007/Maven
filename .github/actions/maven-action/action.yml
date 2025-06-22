@@ -110,6 +110,10 @@ runs:
             } |
             Select-Object -ExpandProperty FullName 
       
+        # Debugging: Log matching files
+        Write-Host "Debugging: Matching files after applying pattern and filters..."
+        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
+      
         # Check if any matching files are found
         if (-not $matchingJUnitResultFiles) {
             Write-Host "No test results found matching pattern: $testResultsFiles"
@@ -124,4 +128,5 @@ runs:
             Write-Host "Publishing test result file: $file"
         }
         Write-Host "Test results published successfully with title: $testRunTitle."
+
 
