@@ -68,44 +68,50 @@ runs:
     - name: Publish JUnit Test Results
       shell: pwsh
       run: |
+        # Debugging input values
+        Write-Host "DEBUG: Inputs received:"
+        Write-Host "publishJUnitResults: ${{ inputs.publishJUnitResults }}"
+        Write-Host "testResultsFiles: ${{ inputs.testResultsFiles }}"
+        Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
+    
         # Get inputs
         $publishJUnitResults = ${{ inputs.publishJUnitResults }}
         $testResultsFiles = '${{ inputs.testResultsFiles }}'
         $testRunTitle = '${{ inputs.testRunTitle }}'
         $buildFolder = '${{ github.workspace }}'
-
+    
         Write-Host "Publish JUnit Results: $publishJUnitResults"
         Write-Host "Test Results Files Pattern: $testResultsFiles"
         Write-Host "Test Run Title: $testRunTitle"
         Write-Host "Build Folder: $buildFolder"
-
+    
         if (-not $publishJUnitResults) {
             Write-Host "Publishing JUnit results is disabled."
             exit 0
         }
-
+    
         # Find matching JUnit result files
         $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
             Where-Object { 
                 $_.FullName -like $testResultsFiles
             } |
             Select-Object -ExpandProperty FullName
-
+    
         # Check if any matching files are found
         if (-not $matchingJUnitResultFiles) {
             Write-Host "No test results found matching pattern: $testResultsFiles"
             exit 0
         }
-
+    
         Write-Host "Found matching JUnit result files:"
         $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
-
+    
         # Publish test results (logic for publishing can be customized here)
         foreach ($file in $matchingJUnitResultFiles) {
             Write-Host "Publishing test result file: $file"
             # Add logic to upload or process the test results as needed
         }
-
+    
         Write-Host "Test results published successfully with title: $testRunTitle."
 
     - name: Run Maven Package
@@ -141,3 +147,4 @@ runs:
         } catch {
           Write-Error "Maven build failed with an exception: $_"
           exit 1
+         } 
