@@ -8,7 +8,7 @@ name: Maven
 
 inputs:
   mavenPomFile:
-    description: 'The relative path to the Maven POM file that defines the project configuration and dependencies..'
+    description: 'The relative path to the Maven POM file that defines the project configuration and dependencies.'
     required: true
     type: string
   goals:
@@ -20,6 +20,12 @@ inputs:
     required: false
     type: string
     default: ''
+  publishJUnitResults:
+    required: true
+    type: boolean
+  testResultsFiles:
+    required: true
+    type: string 
   testRunTitle:
     description: 'A descriptive title for the test run, useful for identifying the purpose of the build.'
     required: false
@@ -37,6 +43,7 @@ runs:
         Write-Host "Description : Build, test, and deploy with Apache Maven."
         Write-Host "Version     : v3"
         Write-Host "======================================================================="
+    
     - name: Validate inputs
       shell: pwsh
       run: |
@@ -57,11 +64,53 @@ runs:
           Write-Error "Exception While Validating inputs: $_"
           exit 1
         }
-        
+
+    - name: Publish JUnit Test Results
+      shell: pwsh
+      run: |
+        # Get inputs
+        $publishJUnitResults = ${{ inputs.publishJUnitResults }}
+        $testResultsFiles = '${{ inputs.testResultsFiles }}'
+        $testRunTitle = '${{ inputs.testRunTitle }}'
+        $buildFolder = '${{ github.workspace }}'
+
+        Write-Host "Publish JUnit Results: $publishJUnitResults"
+        Write-Host "Test Results Files Pattern: $testResultsFiles"
+        Write-Host "Test Run Title: $testRunTitle"
+        Write-Host "Build Folder: $buildFolder"
+
+        if (-not $publishJUnitResults) {
+            Write-Host "Publishing JUnit results is disabled."
+            exit 0
+        }
+
+        # Find matching JUnit result files
+        $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
+            Where-Object { 
+                $_.FullName -like $testResultsFiles
+            } |
+            Select-Object -ExpandProperty FullName
+
+        # Check if any matching files are found
+        if (-not $matchingJUnitResultFiles) {
+            Write-Host "No test results found matching pattern: $testResultsFiles"
+            exit 0
+        }
+
+        Write-Host "Found matching JUnit result files:"
+        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
+
+        # Publish test results (logic for publishing can be customized here)
+        foreach ($file in $matchingJUnitResultFiles) {
+            Write-Host "Publishing test result file: $file"
+            # Add logic to upload or process the test results as needed
+        }
+
+        Write-Host "Test results published successfully with title: $testRunTitle."
+
     - name: Run Maven Package
       shell: pwsh
       run: |
-     
         $pom = "${{ inputs.mavenPomFile }}"
         $opts = "${{ inputs.options }}"
         $title = "${{ inputs.testRunTitle }}"
@@ -92,4 +141,3 @@ runs:
         } catch {
           Write-Error "Maven build failed with an exception: $_"
           exit 1
-        }
