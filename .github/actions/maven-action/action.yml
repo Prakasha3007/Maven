@@ -93,15 +93,6 @@ runs:
         Write-Host "Listing all .xml files in the workspace..."
         Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" | ForEach-Object { Write-Host $_.FullName }
       
-        # Debugging: Test validity of each .xml file
-        Write-Host "Testing validity of each .xml file..."
-        Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
-            ForEach-Object {
-                $filePath = $_.FullName
-                Write-Host "File: $filePath"
-                Write-Host "Is Valid: $(Test-Path $filePath -PathType Leaf)"
-            }
-      
         # Find matching JUnit result files
         $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
             Where-Object { 
@@ -132,4 +123,3 @@ runs:
             Write-Host "Publishing test result file: $file"
         }
         Write-Host "Test results published successfully with title: $testRunTitle."
-
