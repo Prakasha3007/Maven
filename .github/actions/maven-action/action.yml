@@ -75,7 +75,7 @@ runs:
         Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
     
         # Get inputs
-        $publishJUnitResults = ${{ inputs.publishJUnitResults }}
+        $publishJUnitResults = [bool]::Parse("${{ inputs.publishJUnitResults }}")
         $testResultsFiles = '${{ inputs.testResultsFiles }}'
         $testRunTitle = '${{ inputs.testRunTitle }}'
         $buildFolder = '${{ github.workspace }}'
