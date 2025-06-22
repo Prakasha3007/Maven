@@ -25,7 +25,10 @@ inputs:
     type: boolean
   testResultsFiles:
     required: true
-    type: string 
+    type: string
+  allowBrokenSymlinks:
+    required: true
+    type: boolean  
   testRunTitle:
     description: 'A descriptive title for the test run, useful for identifying the purpose of the build.'
     required: false
@@ -65,34 +68,20 @@ runs:
           exit 1
         }
 
-    - name: Check Specific File
-      shell: pwsh
-      run: |
-        $filePath = '${{ github.workspace }}\target\surefire-reports\TEST-App.xml'
-        if (Test-Path $filePath) {
-            Write-Host "File exists: $filePath"
-        } else {
-            Write-Host "File does not exist: $filePath"
-        }
-
     - name: Publish JUnit Test Results
       shell: pwsh
-      run: |
-        # Debugging input values
-        Write-Host "DEBUG: Inputs received:"
-        Write-Host "publishJUnitResults: ${{ inputs.publishJUnitResults }}"
-        Write-Host "testResultsFiles: ${{ inputs.testResultsFiles }}"
-        Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
-    
+      run: |    
         # Get inputs
         $publishJUnitResults = [bool]::Parse("${{ inputs.publishJUnitResults }}")
         $testResultsFiles = '${{ inputs.testResultsFiles }}'
         $testRunTitle = '${{ inputs.testRunTitle }}'
+        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}")
         $buildFolder = '${{ github.workspace }}'
     
         Write-Host "Publish JUnit Results: $publishJUnitResults"
         Write-Host "Test Results Files Pattern: $testResultsFiles"
         Write-Host "Test Run Title: $testRunTitle"
+        Write-Host "Allow Broken Symlinks: $allowBrokenSymlinks"
         Write-Host "Build Folder: $buildFolder"
     
         if (-not $publishJUnitResults) {
@@ -106,55 +95,25 @@ runs:
                 $_.FullName -like $testResultsFiles
             } |
             Select-Object -ExpandProperty FullName
+            
+        $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
+              Where-Object { 
+                  $_.FullName -like $testResultsFiles -and 
+                  ($allowBrokenSymbolicLinks -or -not (Test-Path $_.FullName -PathType Leaf))
+              } |
+              Select-Object -ExpandProperty FullName'    
     
         # Check if any matching files are found
         if (-not $matchingJUnitResultFiles) {
             Write-Host "No test results found matching pattern: $testResultsFiles"
             exit 0
         }
-    
+        
         Write-Host "Found matching JUnit result files:"
         $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
     
         # Publish test results (logic for publishing can be customized here)
         foreach ($file in $matchingJUnitResultFiles) {
             Write-Host "Publishing test result file: $file"
-            # Add logic to upload or process the test results as needed
         }
-    
         Write-Host "Test results published successfully with title: $testRunTitle."
-
-    - name: Run Maven Package
-      shell: pwsh
-      run: |
-        $pom = "${{ inputs.mavenPomFile }}"
-        $opts = "${{ inputs.options }}"
-        $title = "${{ inputs.testRunTitle }}"
-        $goal = "${{ inputs.goals }}"
-     
-        Write-Host "Starting Maven build..."
-        if ($title) {
-          Write-Host "Test Run Title: $title"
-        }
-        Write-Host "Using POM: $pom"
-        Write-Host "Using goal: $goal"
-        
-        if ($opts) {
-          Write-Host "Maven Options: $opts"
-          $cmd = "mvn --batch-mode --file `"$pom`" $opts $goal"
-        } else {
-          $cmd = "mvn --batch-mode --file `"$pom`" $goal"
-        }
-     
-        Write-Host "Running command: $cmd"
-        try {
-          Invoke-Expression $cmd
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Maven build failed!"
-            exit $LASTEXITCODE
-          }
-          Write-Host "Maven build completed successfully."
-        } catch {
-          Write-Error "Maven build failed with an exception: $_"
-          exit 1
-         } 
