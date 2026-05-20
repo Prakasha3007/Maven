@@ -73,9 +73,14 @@
 <distributionManagement>
     <repository>
         <id>nexus-maven-group</id>
-        <name>Nexus Maven Group Repository</name>
+        <name>Nexus Releases Repository</name>
         <url>http://10.0.0.5:8081/repository/maven-public/</url>
-        <uniqueVersion>false</uniqueVersion>
     </repository>
+    <snapshotRepository>
+        <id>nexus-maven-group</id>
+        <name>Nexus Snapshots Repository</name>
+        <url>http://10.0.0.5:8081/repository/maven-snapshots/</url>
+    </snapshotRepository>
 </distributionManagement>
+
 </project>

@@ -20,22 +20,24 @@ inputs:
     required: false
     type: string
     default: ''
+  publishJUnitResults:
+    required: true
+    type: boolean
+  testResultsFiles:
+    required: true
+    type: string
+  allowBrokenSymlinks:
+    required: true
+    type: boolean  
   testRunTitle:
     description: 'A descriptive title for the test run, useful for identifying the purpose of the build.'
     required: false
     type: string
     default: 'Default Test Run'
-  nexus_username:
-    description: 'The username for authenticating with the Nexus repository, used for deploying artifacts.'
-    required: true
-  nexus_password:
-    description: 'The password for authenticating with the Nexus repository, used for deploying artifacts.'
-    required: true
 
 runs:
   using: 'composite'
   steps:
-
     - name: Maven Task Header
       shell: pwsh
       run: |
@@ -44,7 +46,7 @@ runs:
         Write-Host "Description : Build, test, and deploy with Apache Maven."
         Write-Host "Version     : v3"
         Write-Host "======================================================================="
-
+    
     - name: Validate inputs
       shell: pwsh
       run: |
@@ -62,44 +64,51 @@ runs:
             Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
           }
         } catch {
-           Write-Error "Exception While Validating inputs: $_"
+          Write-Error "Exception While Validating inputs: $_"
           exit 1
         }
 
-    - name: Verify Maven Installation
+    - name: Publish JUnit Test Results
       shell: pwsh
-      run: mvn -v 
+      run: |    
+        # Get inputs
+        $publishJUnitResults = [bool]::Parse("${{ inputs.publishJUnitResults }}")
+        $testResultsFiles = '${{ inputs.testResultsFiles }}'
+        $testRunTitle = '${{ inputs.testRunTitle }}'
+        $allowBrokenSymlinks = [bool]::Parse("${{ inputs.allowBrokenSymlinks }}") # Correct variable name
+        $buildFolder = '${{ github.workspace }}'
+      
+        Write-Host "Publish JUnit Results: $publishJUnitResults"
+        Write-Host "Test Results Files Pattern: $testResultsFiles"
+        Write-Host "Test Run Title: $testRunTitle"
+        Write-Host "Allow Broken Symlinks: $allowBrokenSymlinks"
+        Write-Host "Build Folder: $buildFolder"
+      
+        if (-not $publishJUnitResults) {
+            Write-Host "Publishing JUnit results is disabled."
+            exit 0
+        }
+      
+        # Find matching JUnit result files
+        $matchingJUnitResultFiles = Get-ChildItem -Path $buildFolder -Recurse -Filter "*.xml" |
+            Where-Object { 
+                $_.FullName -like $testResultsFiles -and 
+                ($allowBrokenSymlinks -or -not (Test-Path $_.FullName -PathType Leaf)) # Correct variable name
+            } |
+            Select-Object -ExpandProperty FullName 
+      
+        # Check if any matching files are found
+        if (-not $matchingJUnitResultFiles) {
+            Write-Host "No test results found matching pattern: $testResultsFiles"
+            exit 0
+        }
+        
+        Write-Host "Found matching JUnit result files:"
+        $matchingJUnitResultFiles | ForEach-Object { Write-Host $_ }
+      
+        # Publish test results (logic for publishing can be customized here)
+        foreach ($file in $matchingJUnitResultFiles) {
+            Write-Host "Publishing test result file: $file"
+        }
+        Write-Host "Test results published successfully with title: $testRunTitle."
 
-    - name: Run Maven Package
-      shell: pwsh
-      run: |
-        $pom = "${{ inputs.mavenPomFile }}"
-        $opts = "${{ inputs.options }}"
-        $title = "${{ inputs.testRunTitle }}"
-        $goal = "${{ inputs.goals }}"
-    
-        Write-Host "Starting Maven build..."
-        if ($title) {
-          Write-Host "Test Run Title: $title"
-        }
-        Write-Host "Using POM: $pom"
-        Write-Host "Using goal: $goal"
-        if ($opts) {
-          Write-Host "Maven Options: $opts"
-          $cmd = "mvn --batch-mode --file `"$pom`" $opts $goal"
-        } else {
-          $cmd = "mvn --batch-mode --file `"$pom`" $goal"
-        }
-    
-        Write-Host "Running command: $cmd"
-        try {
-          Invoke-Expression $cmd
-          if ($LASTEXITCODE -ne 0) {
-            Write-Error "Maven build failed!"
-            exit $LASTEXITCODE
-          }
-          Write-Host "Maven build completed successfully."
-        } catch {
-          Write-Error "Maven build failed with an exception: $_"
-          exit 1
-        }

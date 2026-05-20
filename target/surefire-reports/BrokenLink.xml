@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="BrokenLink" tests="0" failures="0" errors="1" skipped="0" time="0.000">
+  <properties>
+    <property name="status" value="broken"/>
+    <property name="reason" value="Symbolic link target not found or inaccessible"/>
+  </properties>
+  <error message="The test results file is missing or the symbolic link is broken."/>
+</testsuite>

@@ -1,27 +1,14 @@
-#########################################################################
-# Workflow Name : Maven
-# Description   : Build, test, and deploy with Apache Maven.
-# Version       : v3
-#########################################################################
- 
 name: Maven Reusable Workflow
- 
+
 on:
   workflow_call:
-    secrets:
-      nexus_username:
-        description: 'Nexus username'
-        required: true
-      nexus_password:
-       description: 'Nexus password'
-       required: true
     inputs:
       mavenPomFile:
         description: 'Path to the Maven POM file'
         required: true
         type: string
       goals:
-        description: ''
+        description: 'Maven goals to execute (e.g., clean package)'
         required: false
         type: string   
       options:
@@ -34,15 +21,27 @@ on:
         required: false
         type: string
         default: 'Default Test Run'
- 
+      javaHomeOption:
+        description: 'Option to set JAVA_HOME (JDKVersion or Path)'
+        required: true
+        type: string
+      jdkVersionOption:
+        description: 'JDK version to use (e.g., 1.8, 11)'
+        required: false
+        type: string
+      jdkDirectory:
+        description: 'Custom JDK directory path'
+        required: false
+        type: string
+
 jobs:
   maven-build:
-    runs-on: windows-latest
- 
+    runs-on: self-hosted
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
- 
+
       - name: Maven Task Header
         run: |
           Write-Host "======================================================================="
@@ -50,49 +49,91 @@ jobs:
           Write-Host "Description : Build, test, and deploy with Apache Maven."
           Write-Host "Version     : v3"
           Write-Host "======================================================================="
- 
-      - name: Validate inputs
+
+      - name: Validate and Set JAVA_HOME
         shell: pwsh
         run: |
           try {
-            Write-Host "Validating inputs..."
-            if (-not "${{ inputs.mavenPomFile }}") {
-              Write-Error "'mavenPomFile' is required but not provided."
+            # Retrieve inputs
+            $javaHomeOption = "${{ inputs.javaHomeOption }}"
+            $jdkVersionOption = "${{ inputs.jdkVersionOption }}"
+            $jdkDirectory = "${{ inputs.jdkDirectory }}"
+       
+            Write-Host "Validating JAVA_HOME configuration..."
+            Write-Host "javaHomeOption: $javaHomeOption"
+            Write-Host "jdkDirectory: $jdkDirectory"
+       
+            if (-not $jdkDirectory) {
+              Write-Error "Error: 'jdkDirectory' is required when 'javaHomeOption' is set to '$javaHomeOption'."
               exit 1
             }
-            Write-Host "mavenPomFile: ${{ inputs.mavenPomFile }}"
-            if ("${{ inputs.options }}") {
-              Write-Host "options: ${{ inputs.options }}"
+       
+            $javaExePath = Join-Path $jdkDirectory "bin\java.exe"
+            if (-not (Test-Path $javaExePath)) {
+              Write-Error "Error: The specified JDK directory does not contain a valid Java executable: $javaExePath"
+              exit 1
             }
-            if ("${{ inputs.testRunTitle }}") {
-              Write-Host "testRunTitle: ${{ inputs.testRunTitle }}"
+       
+            if ($javaHomeOption -eq "JDKVersion") {
+              if (-not $jdkVersionOption) {
+                Write-Error "Error: 'jdkVersionOption' is required when 'javaHomeOption' is set to 'JDKVersion'."
+                exit 1
+              }
+              Write-Host "JDK Version Option: $jdkVersionOption"
+            } elseif ($javaHomeOption -ne "Path") {
+              Write-Error "Error: Invalid value for 'javaHomeOption'. Expected 'JDKVersion' or 'Path'."
+              exit 1
             }
+       
+            # Set JAVA_HOME for current step
+            $env:JAVA_HOME = $jdkDirectory
+       
+            # Remove existing Java entries from PATH
+            $cleanedPath = ($env:PATH -split ';' | Where-Object { $_ -notmatch 'Java' -and $_ -ne '' }) -join ';'
+            $env:PATH = "$jdkDirectory\bin;$cleanedPath"
+       
+            # Output for debugging
+            Write-Host "JAVA_HOME: $env:JAVA_HOME"
+            Write-Host "Resolved java path: $(Get-Command java).Source"
+            & java -version
+       
+            # Persist environment variables for next steps
+            "`nJAVA_HOME=$jdkDirectory" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            "`nPATH=$jdkDirectory\bin;$cleanedPath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+       
+            Write-Host "JAVA_HOME and PATH exported successfully for subsequent steps."
           } catch {
-            Write-Error $_.Exception.Message
+            Write-Error "An error occurred during JAVA_HOME validation: $_"
             exit 1
           }
  
       - name: Run Maven Package
         shell: pwsh
         run: |
+          Write-Host "Verifying Java version before running Maven..."
+          Write-Host "JAVA_HOME: $env:JAVA_HOME"
+          Write-Host "Resolved java path: $(Get-Command java).Source"
+          & java -version
+       
           $pom = "${{ inputs.mavenPomFile }}"
           $opts = "${{ inputs.options }}"
           $title = "${{ inputs.testRunTitle }}"
           $goal = "${{ inputs.goals }}"
-      
+       
           Write-Host "Starting Maven build..."
           if ($title) {
             Write-Host "Test Run Title: $title"
           }
           Write-Host "Using POM: $pom"
           Write-Host "Using goal: $goal"
+          
           if ($opts) {
             Write-Host "Maven Options: $opts"
             $cmd = "mvn --batch-mode --file `"$pom`" $opts $goal"
           } else {
             $cmd = "mvn --batch-mode --file `"$pom`" $goal"
           }
-      
+       
           Write-Host "Running command: $cmd"
           try {
             Invoke-Expression $cmd
@@ -102,8 +143,6 @@ jobs:
             }
             Write-Host "Maven build completed successfully."
           } catch {
-            Write-Error "Maven build failed with an exception."
-            Write-Error $_.Exception.Message
+            Write-Error "Maven build failed with an exception: $_"
             exit 1
-          }
-      
+          } 

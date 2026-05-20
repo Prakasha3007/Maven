@@ -5,10 +5,15 @@ on:
     branches:
       - main
   workflow_dispatch:
+  
+env: 
+  nexus_username: ${{ secrets.NEXUS_USERNAME }}
+  nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
 jobs:
   ibp-data-query:
-    runs-on: self-hosted
+    #runs-on: self-hosted
+    runs-on: windows-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -18,32 +23,10 @@ jobs:
         with:
           mavenPomFile: './pom.xml'
           goals: clean package
+          #goals: clean package deploy 
           options: '--settings ./settings.xml'
-          testRunTitle: 'IBP Data Query'  
-          nexus_username: ${{ secrets.NEXUS_USERNAME }}
-          nexus_password: ${{ secrets.NEXUS_PASSWORD }}
+          publishJUnitResults: true
+          testResultsFiles: '**\target\surefire-reports\*.xml'
+          testRunTitle: 'testHelloWorld'
+          allowBrokenSymlinks: false
 
-      - name: Copy Generated Files
-        uses: Prakasha3007/Copy-Files/.github/actions/copyfile-actions@main
-        with:
-          SourceFolder: sourcefolder
-          contents: '**'
-          TargetFolder: targetFolder
-          CleanTargetFolder: true
-          overwrite: false
-          FlattenFolders: false
-          preserveTimestamp: false
-          retryCount: '3'
-          delayBetweenRetries: '5000'
-          ignoreMakeDirErrors: false
-          
-      - name: PowerShell Script
-        uses: Prakasha3007/PowerShell/.github/actions/pshell-actions@main
-        with:
-          targetType: filePath
-          filePath: 'scripts/sample-script.ps1'
-          arguments: 'arg1 arg2'
-          script: hostname
-          workingFolder: '.'
-          errorPreference: Stop
-          ignoreLASTEXITCODE: false    
