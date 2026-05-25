@@ -1,0 +1,13 @@
+name: Training Session
+
+on:
+  push:
+
+jobs:
+  demo-job:
+   runs-on: windows-latest
+
+   steps:
+     - name: Print Message
+       run: echo "Training Session & Github Actions"
+   
