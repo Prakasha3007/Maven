@@ -2,6 +2,9 @@ name: Training Session
 
 on:
   push:
+    branches:
+      - feature/JP
+  workflow_dispatch:
 
 jobs:
   demo-job:
