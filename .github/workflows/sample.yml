@@ -21,7 +21,7 @@ jobs:
       run: mvn clean install
 
     - name: display folder
-      run: dir targer
+      run: dir target
 
     - name: display folder ear file
-      run: dir targer\*.ear
+      run: dir target\*.jar
