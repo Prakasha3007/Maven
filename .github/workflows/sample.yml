@@ -11,6 +11,15 @@ jobs:
    runs-on: windows-latest
 
    steps:
-     - name: Print Message
-       run: echo "Training Session & Github Actions"
+
+    - name: Checkout Code
+      uses: action/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        java-version: 17
+    
+    - name: Java Version
+      run: java -version
    
