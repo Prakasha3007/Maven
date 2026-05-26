@@ -25,3 +25,9 @@ jobs:
 
     - name: display folder ear file
       run: dir target\*.jar
+
+    - name: upload the jar files
+      uses: actions/upload-artifact@v4
+      with:
+        name: jar-package
+        path: target/*.jar
