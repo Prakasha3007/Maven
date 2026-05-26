@@ -11,11 +11,11 @@ jobs:
    runs-on: windows-latest
 
    steps:
-
     - name: Checkout Code
       uses: actions/checkout@v4
-
     
     - name: Java Version
       run: java -version
-   
+      
+    - name: Checking mvn version
+      run: mvn clean install
