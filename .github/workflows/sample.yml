@@ -19,3 +19,9 @@ jobs:
       
     - name: Checking mvn version
       run: mvn clean install
+
+    - name: display folder
+      run: dir targer
+
+    - name: display folder ear file
+      run: dir targer\*.ear
